@@ -8,29 +8,33 @@ class Socket {
         this.wss = new WebSocketServer({ noServer: true });
 
     }
-    allowedOrigins = ["*"]
     getsocket() {
         return this.wss;
     }
     public handleUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer) {
+        console.log("Handle upgrade working")
         const origin = request.headers.origin || "";
-        if (this.allowedOrigins.includes(origin)) {
-            this.wss.handleUpgrade(request, socket, head, (ws) => {
-                this.wss.emit('connection', ws, request);
-            })
-        }
+        this.wss.handleUpgrade(request, socket, head, (ws) => {
+            this.wss.emit('connection', ws, request);
+        })
     }
+
     public initlisteners() {
         const wss = this.wss;
         wss.on('connection', (ws) => {
+            console.log("ws");
             ws.on('error', console.error)
-            ws.on('message', ({ message }: { message: string }) => {
+            ws.on('message', message => {
                 wss.clients.forEach((client) => {
-                    client.send(message);
+                    console.log("server received : ", message.toString());
+                    setInterval(() => {
+                        ws.send(message.toString());
+                    }, 2000);
                 })
             })
             ws.on('close', () => {
                 console.log('Disconnected');
+                ws.close();
             })
             ws.send('Connected to websocket server')
         })

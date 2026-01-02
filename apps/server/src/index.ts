@@ -1,8 +1,6 @@
 import http from 'http'
 import dotenv from "dotenv";
 import Socket from './services/socket.js';
-import { WebSocketServer } from 'ws';
-import { log } from 'console';
 dotenv.config();
 const PORT = process.env.PORT || 8000;
 
@@ -15,8 +13,8 @@ async function init() {
         res.end("Web socket server running");
     })
 
-    server.on('upgrade',(request,socket,head)=> {
-        SocketService.handleUpgrade(request,socket,head);
+    server.on('upgrade', (request, socket, head) => {
+        SocketService.handleUpgrade(request, socket, head);
     })
     SocketService.initlisteners();
     server.listen(PORT, () => {
