@@ -1,5 +1,5 @@
 "use client"
-import { ArrowLeft, CircleUser, EllipsisVertical, Phone } from "lucide-react";
+import { ArrowLeft, CircleUser, EllipsisVertical, Phone, Send } from "lucide-react";
 import { useEffect, useState } from "react"
 
 interface Messages {
@@ -51,13 +51,18 @@ export default function Page() {
           className="bg-[url('https://w0.peakpx.com/wallpaper/1002/489/HD-wallpaper-doodle-art-game-controller-art.jpg')] flex-1 bg-cover bg-center w-full ">
 
           {chats && chats.map((msg) => (
-            <div className={`inline-flex max-w-[70%] px-4 py-3 gap-5  ${msg.id % 2 == 0 ? "justify-end" : "justify-start"} `}
+            <div className={`flex px-3 py-4 p-5 gap-5  ${msg.id % 2 == 0 ? "justify-end" : "justify-start"} `}
               key={msg.id}>
               <p className=" p-10  bg-gray-800 border border-gray-700 w-fit h-auto text-2xl rounded-xl" >{msg.message}</p>
-              {/* <p>{msg.timeStamp.toString()}</p> */}
+
             </div>
           ))}
+          
         </div>
+        <div className="flex justify-center p-5 m-5">
+            <input type="text" placeholder="Enter you text"  className="bg-gray-800 w-2/3 h-10"/>
+            <button><Send /></button>
+          </div>
       </div>
     </div>
   )
