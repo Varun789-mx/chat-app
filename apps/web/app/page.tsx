@@ -2,38 +2,49 @@
 import { ArrowLeft, CircleUser, EllipsisVertical, Phone, Send } from "lucide-react";
 import { useEffect, useState } from "react"
 import { useSocket } from "../context/SocketProvider";
+import { timeStamp } from "console";
 
+
+enum usertype {
+  User = "USER",
+  Server = "SERVER"
+}
 interface Messages {
   id: number;
+  type: usertype
   message: string;
   timeStamp: Date;
 }
-const testChats = [{
-  id: 1,
-  message: "Hi good morning",
-  timeStamp: new Date,
-}, {
-  id: 2,
-  message: " good morning",
-  timeStamp: new Date,
-}, {
-  id: 3,
-  message: "How are you",
-  timeStamp: new Date,
-}, {
-  id: 4,
-  message: "I'm good what about you",
-  timeStamp: new Date,
-}]
+
 export type Chats = Messages[];
 export default function Page() {
-  const sendMessage = useSocket();
+  const socket = useSocket();
   const [chats, setchats] = useState<Chats>([]);
   const [msg, setmsg] = useState("");
 
+  const HandleMsg = (msg: string) => {
+    const usermsg = {
+      id: Math.random() * 10,
+      type: usertype.User,
+      message: msg,
+      timeStamp: new Date,
+    }
+    setchats(prev => [...prev, usermsg]);
+
+
+  }
   useEffect(() => {
-    setchats(testChats);
-  }, [])
+    socket.servermsg.forEach((msg) => {
+      const sm = {
+        id: Math.random() * 10,
+        type: usertype.Server,
+        message: msg,
+        timeStamp: new Date,
+      }
+      setchats(prev => [...prev, sm]);
+    }
+    )
+  }, [socket.servermsg])
   return (
     <div className="w-full bg-black flex justify-center h-screen">
       <div className="w-2/4 md:w-2/4 flex justify-center flex-col bg-gray-800 shadow-xl">
@@ -57,14 +68,16 @@ export default function Page() {
             <div className={`flex px-3 py-4 p-5 gap-5  ${msg.id % 2 == 0 ? "justify-end" : "justify-start"} `}
               key={msg.id}>
               <p className=" p-10  bg-gray-800 border border-gray-700 w-fit h-auto text-2xl rounded-xl" >{msg.message}</p>
-
             </div>
           ))}
 
         </div>
         <div className="flex justify-center p-5 m-5">
           <input type="text" placeholder="Enter you text" onChange={e => setmsg(e.target.value)} className="bg-gray-800 w-2/3 h-10" />
-          <button onClick={() => sendMessage.SendMessage(msg)}><Send />
+          <button onClick={() => {
+            socket.SendMessage(msg);
+            HandleMsg(msg)
+          }}><Send />
           </button>
         </div>
       </div>
