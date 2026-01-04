@@ -1,6 +1,7 @@
 "use client"
 import { ArrowLeft, CircleUser, EllipsisVertical, Phone, Send } from "lucide-react";
 import { useEffect, useState } from "react"
+import { useSocket } from "../context/SocketProvider";
 
 interface Messages {
   id: number;
@@ -26,7 +27,9 @@ const testChats = [{
 }]
 export type Chats = Messages[];
 export default function Page() {
+  const sendMessage = useSocket();
   const [chats, setchats] = useState<Chats>([]);
+  const [msg, setmsg] = useState("");
 
   useEffect(() => {
     setchats(testChats);
@@ -57,12 +60,13 @@ export default function Page() {
 
             </div>
           ))}
-          
+
         </div>
         <div className="flex justify-center p-5 m-5">
-            <input type="text" placeholder="Enter you text"  className="bg-gray-800 w-2/3 h-10"/>
-            <button><Send /></button>
-          </div>
+          <input type="text" placeholder="Enter you text" onChange={e => setmsg(e.target.value)} className="bg-gray-800 w-2/3 h-10" />
+          <button onClick={() => sendMessage.SendMessage(msg)}><Send />
+          </button>
+        </div>
       </div>
     </div>
   )
