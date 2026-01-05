@@ -2,25 +2,16 @@
 import { ArrowLeft, CircleUser, EllipsisVertical, Phone, Send } from "lucide-react";
 import { useEffect, useState } from "react"
 import { useSocket } from "../context/SocketProvider";
-import { timeStamp } from "console";
+import { Chats, usertype } from "../lib/types";
 
 
-enum usertype {
-  User = "USER",
-  Server = "SERVER"
-}
-interface Messages {
-  id: number;
-  type: usertype
-  message: string;
-  timeStamp: Date;
-}
 
-export type Chats = Messages[];
 export default function Page() {
   const socket = useSocket();
   const [chats, setchats] = useState<Chats>([]);
   const [msg, setmsg] = useState("");
+  const [roomId, setroomId] = useState("");
+
 
   const HandleMsg = (msg: string) => {
     const usermsg = {
@@ -47,6 +38,10 @@ export default function Page() {
   }, [socket.servermsg])
   return (
     <div className="w-full bg-black flex justify-center h-screen">
+      <div className="flex flex-col justify-center bg-gray-800 p-4">
+        <input type="text" onChange={(e) => setroomId(e.target.value)} placeholder="enter your room id" className="border border-blue-500 p-2" />
+        <button type="button" onClick={() => localStorage.setItem("roomId", roomId)} className="bg-blue-500 rounded-xl p-4 text-md" >Submit</button>
+      </div>
       <div className="w-2/4 md:w-2/4 flex justify-center flex-col bg-gray-800 shadow-xl">
 
 

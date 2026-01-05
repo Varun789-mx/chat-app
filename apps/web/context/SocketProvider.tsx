@@ -36,8 +36,9 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    const roomId = localStorage.getItem("roomId");
     if (!socketRef.current) {
-      socketRef.current = new WebSocket('ws://localhost:8000');
+      socketRef.current = new WebSocket(`ws://localhost:8000?room=${roomId}`);
       socketRef.current.onopen = () => {
         console.log('Web socket connected');
       }
