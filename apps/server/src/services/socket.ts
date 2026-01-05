@@ -2,6 +2,7 @@ import type { IncomingMessage } from "http";
 import type { Duplex } from "stream";
 import { Redis } from "ioredis";
 import { WebSocketServer } from "ws";
+import { log } from "console";
 
 const pub = new Redis();
 const sub = new Redis();
@@ -24,7 +25,7 @@ class Socket {
     private async initRedis() {
         try {
             await sub.subscribe("Messages");
-            sub.on('message', (message) => {
+            sub.on('message', (channel,message) => {
                 this.broadcast(message);
             })
         } catch (error) {
@@ -45,7 +46,7 @@ class Socket {
             ws.on('error', console.error)
             ws.on('message', async message => {
                 try {
-                    console.log("Message in publishing", message);
+                    console.log("Message in publishing", message.toString());
                     await pub.publish("Messages", JSON.stringify({
                         message: message.toString(),
                         timeStamp: Date.now(),
@@ -58,7 +59,6 @@ class Socket {
                 console.log('Disconnected');
                 ws.close();
             })
-            ws.send('Connected to websocket server')
         })
     }
 }

@@ -23,7 +23,6 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const socketRef = useRef<WebSocket | null>(null);
   const [servermsg, setservermsg] = useState<string[]>([]);
   const SendMessage: ISocketContext['SendMessage'] = useCallback((msg: string) => {
-    console.log(msg, "Message from client")
     if (socketRef && socketRef.current?.readyState === 1) {
       socketRef.current.send(msg);
     }
@@ -31,9 +30,8 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
 
 
   const onMessageRcd = useCallback((msg: string) => {
-    console.log("Message Rcd from server", msg);
-    const { message } = JSON.parse(msg) 
-    console.log(message,"parse");
+    const { message } = JSON.parse(msg);
+    console.log(message, "parse");
     setservermsg(prev => [...prev, message]);
   }, []);
 
@@ -44,7 +42,8 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
         console.log('Web socket connected');
       }
     }
-    socketRef.current.onmessage = (event) => {
+    socketRef.current.onmessage = function (event) {
+      console.log(event, "event data")
       onMessageRcd(event.data);
     }
 
