@@ -2,6 +2,7 @@ import type { IncomingMessage } from "http";
 import type { Duplex } from "stream";
 import { Redis } from "ioredis";
 import { WebSocketServer } from "ws";
+import { WebSocket } from "ws";
 
 
 const pub = new Redis();
@@ -9,11 +10,14 @@ const sub = new Redis();
 
 class Socket {
     private wss: WebSocketServer;
-    public roomId: string;
+    private roomMap: Map<WebSocket, string>;
+    private SubscriptionSet = new Set<string>();
     constructor() {
         this.wss = new WebSocketServer({ noServer: true });
-        this.initRedis();
-        this.roomId = '';
+        this.roomMap = new Map();
+        sub.on('message', (channel, message) => {
+            this.broadcast(message, channel);
+        })
     }
     getsocket() {
         return this.wss;
@@ -21,47 +25,63 @@ class Socket {
     public handleUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer) {
         const urlParams = new URL(request.url || "", `http://${request.headers.host}`);
         const room = urlParams.searchParams.get('room');
-        if (room) this.roomId = room;
         this.wss.handleUpgrade(request, socket, head, (ws) => {
+            if (room) this.roomMap.set(ws, room);
             this.wss.emit('connection', ws, request);
+
         })
     }
     private async initRedis() {
         try {
-            await sub.subscribe(this.roomId);
-            console.log("Current Channel name", this.roomId);
-            sub.on('message', (channel, message) => {
-                this.broadcast(message);
+            this.roomMap.forEach(async (room) => {
+                await sub.subscribe(room);
+                console.log(room, "subscribing to room");
+                console.log("Current Channel name", room);
+
             })
+
         } catch (error) {
             console.log("Error in redis", error);
         }
     }
-    private broadcast(message: string) {
-        this.wss.clients.forEach((client) => {
-            if (client.readyState === 1) {
-                client.send(message);
+    private broadcast(message: string, userChannel: string) {
+        this.roomMap.forEach((channel, ws) => {
+            if (channel === userChannel && ws.readyState === 1) {
+                ws.send(message);
             }
         })
     }
+
+    private async Subscribe(room: string) {
+        if (this.SubscriptionSet.has(room)) return;
+
+        await sub.subscribe(room);
+        this.SubscriptionSet.add(room);
+        console.log("Subscribed To room :", room);
+    }
     public initlisteners() {
         const wss = this.wss;
-        wss.on('connection', (ws, req) => {
+        wss.on('connection', async (ws) => {
+            const room = this.roomMap.get(ws)
+            if (room) {
+                await this.Subscribe(room);
+            }
             ws.on('error', console.error)
             ws.on('message', async message => {
+                if (!room) return;
                 try {
-                    console.log("Message in publishing", message.toString());
-                    await pub.publish(this.roomId, JSON.stringify({
+                    console.log(room, "room from publishing");
+                    await pub.publish(room, JSON.stringify({
                         message: message.toString(),
                         timeStamp: Date.now(),
-                    }))
+                    }));
                 } catch (error) {
                     console.log("Error in publishing", error);
                 }
+
             })
             ws.on('close', async () => {
                 console.log('Disconnected');
-                ws.close();
             })
         })
     }

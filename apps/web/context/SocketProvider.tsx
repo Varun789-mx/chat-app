@@ -1,15 +1,9 @@
 "use client";
 import React, { useCallback, useEffect, useContext, useRef, useState } from "react";
+import { ISocketContext, SocketProviderProp } from "../lib/types";
 
 
-interface SocketProviderProp {
-  children?: React.ReactNode;
-}
 
-interface ISocketContext {
-  SendMessage: (msg: string) => void;
-  servermsg: string[];
-}
 
 export const SocketContext = React.createContext<ISocketContext | null>(null);
 

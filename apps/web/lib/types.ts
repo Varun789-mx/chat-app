@@ -10,3 +10,12 @@ export interface Messages {
 }
 
 export type Chats = Messages[];
+
+export interface SocketProviderProp {
+  children?: React.ReactNode;
+}
+
+export interface ISocketContext {
+  SendMessage: (msg: string) => void;
+  servermsg: string[];
+}

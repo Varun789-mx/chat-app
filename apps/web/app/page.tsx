@@ -2,7 +2,8 @@
 import { ArrowLeft, CircleUser, EllipsisVertical, Phone, Send } from "lucide-react";
 import { useEffect, useState } from "react"
 import { useSocket } from "../context/SocketProvider";
-import { Chats, usertype } from "../lib/types";
+import { Chats, Messages, usertype } from "../lib/types";
+import { serialize } from "v8";
 
 
 
@@ -14,6 +15,7 @@ export default function Page() {
 
 
   const HandleMsg = (msg: string) => {
+    socket.SendMessage(msg);
     const usermsg = {
       id: Math.random() * 10,
       type: usertype.User,
@@ -21,20 +23,19 @@ export default function Page() {
       timeStamp: new Date,
     }
     setchats(prev => [...prev, usermsg]);
-
-
   }
   useEffect(() => {
     socket.servermsg.forEach((msg) => {
-      const sm = {
+      const sm: Messages = {
         id: Math.random() * 10,
         type: usertype.Server,
         message: msg,
         timeStamp: new Date,
       }
       setchats(prev => [...prev, sm]);
-    }
-    )
+    })
+
+    console.log(socket.servermsg, "Server msg current");
   }, [socket.servermsg])
   return (
     <div className="w-full bg-black flex justify-center h-screen">
@@ -70,7 +71,6 @@ export default function Page() {
         <div className="flex justify-center p-5 m-5">
           <input type="text" placeholder="Enter you text" onChange={e => setmsg(e.target.value)} className="bg-gray-800 w-2/3 h-10" />
           <button onClick={() => {
-            socket.SendMessage(msg);
             HandleMsg(msg)
           }}><Send />
           </button>
