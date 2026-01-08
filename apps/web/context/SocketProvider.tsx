@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useContext, useRef, useState } from "react";
-import { ISocketContext, SocketProviderProp } from "../lib/types";
+import { ISocketContext, MsgObj, SocketProviderProp, usertype } from "../lib/types";
 
 
 
@@ -16,9 +16,9 @@ export const useSocket = () => {
 export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const socketRef = useRef<WebSocket | null>(null);
   const [servermsg, setservermsg] = useState<string[]>([]);
-  const SendMessage: ISocketContext['SendMessage'] = useCallback((msg: string) => {
+  const SendMessage: ISocketContext['SendMessage'] = useCallback((msgData:MsgObj) => {
     if (socketRef && socketRef.current?.readyState === 1) {
-      socketRef.current.send(msg);
+      socketRef.current.send(JSON.stringify(msgData));
     }
   }, []);
 

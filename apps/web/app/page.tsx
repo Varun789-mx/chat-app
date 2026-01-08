@@ -2,32 +2,41 @@
 import { ArrowLeft, CircleUser, EllipsisVertical, Phone, Send } from "lucide-react";
 import { useEffect, useState } from "react"
 import { useSocket } from "../context/SocketProvider";
-import { Chats, Messages, usertype } from "../lib/types";
-import { serialize } from "v8";
-
-
+import { Chats, MsgObj, usertype } from "../lib/types";
 
 export default function Page() {
   const socket = useSocket();
   const [chats, setchats] = useState<Chats>([]);
   const [msg, setmsg] = useState("");
-  const [roomId, setroomId] = useState("");
+  const [UserData, setUserData] = useState({
+    roomId: "",
+    userName: "",
+  });
 
+  const HandleMsg = () => {
 
-  const HandleMsg = (msg: string) => {
-    socket.SendMessage(msg);
     const usermsg = {
-      id: Math.random() * 10,
+      id: crypto.randomUUID(),
+      username: UserData.userName,
       type: usertype.User,
+      roomId: UserData.roomId,
       message: msg,
       timeStamp: new Date,
     }
+    socket.SendMessage(usermsg);
     setchats(prev => [...prev, usermsg]);
   }
   useEffect(() => {
+    if (!UserData.roomId && !UserData.userName) {
+      const localdata = JSON.parse(localStorage.getItem("UserData") || "{}");
+      setUserData(localdata);
+      console.log("Current User data", UserData);
+    }
     socket.servermsg.forEach((msg) => {
-      const sm: Messages = {
-        id: Math.random() * 10,
+      const sm: MsgObj = {
+        id: crypto.randomUUID(),
+        username: UserData.userName,
+        roomId: UserData.roomId,
         type: usertype.Server,
         message: msg,
         timeStamp: new Date,
@@ -39,13 +48,23 @@ export default function Page() {
   }, [socket.servermsg])
   return (
     <div className="w-full bg-black flex justify-center h-screen">
-      <div className="flex flex-col justify-center bg-gray-800 p-4">
-        <input type="text" onChange={(e) => setroomId(e.target.value)} placeholder="enter your room id" className="border border-blue-500 p-2" />
-        <button type="button" onClick={() => localStorage.setItem("roomId", roomId)} className="bg-blue-500 rounded-xl p-4 text-md" >Submit</button>
+      <div className="flex flex-col p-4 gap-4 justify-center bg-gray-800 ">
+
+        <input type="text"
+          placeholder="Enter you User Name"
+          onChange={e => setUserData({ ...UserData, userName: e.target.value })}
+          className="border border-blue-500 p-3 rounded-xl" />
+
+        <input type="text"
+          onChange={(e) => setUserData({ ...UserData, roomId: e.target.value })}
+          placeholder="enter your room id"
+          className="border border-blue-500 p-3 pl-4 placeholder:text-sm rounded-xl" />
+
+        <button type="button" onClick={() => {
+          localStorage.setItem("UserData", JSON.stringify(UserData));
+        }} className="bg-blue-500 rounded-xl p-4 text-md" >Submit</button>
       </div>
       <div className="w-2/4 md:w-2/4 flex justify-center flex-col bg-gray-800 shadow-xl">
-
-
         <div className="h-16 px-4 flex items-center justify-between border-b border-gray-800 bg-gray-950">
           <div className="flex gap-4 items-center">
             <ArrowLeft />
@@ -61,7 +80,7 @@ export default function Page() {
           className="bg-[url('https://w0.peakpx.com/wallpaper/1002/489/HD-wallpaper-doodle-art-game-controller-art.jpg')] flex-1 bg-cover bg-center w-full ">
 
           {chats && chats.map((msg) => (
-            <div className={`flex px-3 py-4 p-5 gap-5  ${msg.id % 2 == 0 ? "justify-end" : "justify-start"} `}
+            <div className={`flex px-3 py-4 p-5 gap-5  ${msg.type === usertype.Server ? "justify-end" : "justify-start"} `}
               key={msg.id}>
               <p className=" p-10  bg-gray-800 border border-gray-700 w-fit h-auto text-2xl rounded-xl" >{msg.message}</p>
             </div>
@@ -69,9 +88,9 @@ export default function Page() {
 
         </div>
         <div className="flex justify-center p-5 m-5">
-          <input type="text" placeholder="Enter you text" onChange={e => setmsg(e.target.value)} className="bg-gray-800 w-2/3 h-10" />
+          <input type="text" placeholder="Enter you text" onChange={e => setmsg(e.target.value)} className="bg-gray-800 w-2/3 h-10 rounded-2xl" />
           <button onClick={() => {
-            HandleMsg(msg)
+            HandleMsg
           }}><Send />
           </button>
         </div>

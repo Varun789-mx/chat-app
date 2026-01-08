@@ -28,7 +28,6 @@ class Socket {
         this.wss.handleUpgrade(request, socket, head, (ws) => {
             if (room) this.roomMap.set(ws, room);
             this.wss.emit('connection', ws, request);
-
         })
     }
     private async initRedis() {
@@ -70,7 +69,6 @@ class Socket {
             ws.on('message', async message => {
                 if (!room) return;
                 try {
-                    console.log(room, "room from publishing");
                     await pub.publish(room, JSON.stringify({
                         message: message.toString(),
                         timeStamp: Date.now(),
@@ -78,7 +76,6 @@ class Socket {
                 } catch (error) {
                     console.log("Error in publishing", error);
                 }
-
             })
             ws.on('close', async () => {
                 console.log('Disconnected');

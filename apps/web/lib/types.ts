@@ -2,20 +2,21 @@ export enum usertype {
   User = "USER",
   Server = "SERVER"
 }
-export interface Messages {
-  id: number;
-  type: usertype
-  message: string;
-  timeStamp: Date;
+export interface MsgObj { 
+  id:string,
+  username:string,
+  type:usertype,
+  message:string,
+  roomId:string,
+  timeStamp:Date,
 }
-
-export type Chats = Messages[];
+export type Chats = MsgObj[];
 
 export interface SocketProviderProp {
   children?: React.ReactNode;
 }
 
 export interface ISocketContext {
-  SendMessage: (msg: string) => void;
+  SendMessage: (msg: MsgObj) => void;
   servermsg: string[];
 }
