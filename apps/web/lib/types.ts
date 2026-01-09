@@ -18,5 +18,5 @@ export interface SocketProviderProp {
 
 export interface ISocketContext {
   SendMessage: (msg: MsgObj) => void;
-  servermsg: string[];
+  servermsg: MsgObj | null;
 }
