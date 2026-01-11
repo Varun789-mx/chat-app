@@ -39,14 +39,14 @@ export default function Page() {
     }
   }, [])
   useEffect(() => {
-    if (socket.servermsg?.username === UserData.userName) {
+    const sm = socket.servermsg;
+    if (!sm) return;
+    if (sm.username === UserData.userName) {
       return;
     }
-    const sm = socket.servermsg;
+
     if (sm?.type === usertype.Server) {
-      if (sm) {
-        chats.push(sm);
-      }
+      setchats(prev => [...prev, sm]);
     }
     console.log(chats, "Current chats");
     console.log(socket.servermsg, "Server msg current");
