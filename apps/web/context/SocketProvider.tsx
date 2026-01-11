@@ -18,19 +18,18 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [servermsg, setservermsg] = useState<MsgObj | null>(null);
   const SendMessage: ISocketContext['SendMessage'] = useCallback((msgData: MsgObj) => {
     if (socketRef && socketRef.current?.readyState === 1) {
-      console.log(msgData, "From send");
       socketRef.current.send(JSON.stringify(msgData));
     }
   }, []);
 
 
   const onMessageRcd = useCallback((msgObject: MsgObj) => {
+    msgObject.type = usertype.Server;
     setservermsg(msgObject);
   }, []);
 
   useEffect(() => {
     const { roomId } = JSON.parse(localStorage.getItem("UserData") || "{}");
-    console.log(roomId, "From function");
     if (!socketRef.current) {
       socketRef.current = new WebSocket(`ws://localhost:8000?room=${roomId}`);
       socketRef.current.onopen = () => {
@@ -38,11 +37,11 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       }
     }
     socketRef.current.onmessage = function (event) {
-      console.log(event, "event data")
       const { message } = JSON.parse(event.data);
-      onMessageRcd(message);
+      const parsemsg = JSON.parse(message);
+      console.log(parsemsg, "From json parse");
+      onMessageRcd(parsemsg);
     }
-
     return () => {
       socketRef.current?.close();
     }
