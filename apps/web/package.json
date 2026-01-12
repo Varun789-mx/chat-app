@@ -19,7 +19,8 @@
     "next": "16.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
