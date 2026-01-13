@@ -3,10 +3,19 @@ import type { Duplex } from "stream";
 import { Redis } from "ioredis";
 import { WebSocketServer } from "ws";
 import { WebSocket } from "ws";
+import dotenv from "dotenv";
+dotenv.config();
 
-
-const pub = new Redis();
-const sub = new Redis();
+const pub = new Redis({
+    port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379,
+    host: process.env.REDIS_HOSTNAME || "",
+    password: process.env.REDIS_PASSWORD || "",
+});
+const sub = new Redis({
+    port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379,
+    host: process.env.REDIS_HOSTNAME || "",
+    password: process.env.REDIS_PASSWORD || "",
+});
 
 class Socket {
     private wss: WebSocketServer;
