@@ -14,6 +14,7 @@
     "@repo/ui": "*",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/ws": "^8.18.1",
+    "dotenv": "^17.2.3",
     "ioredis": "^5.8.2",
     "lucide-react": "^0.562.0",
     "next": "16.1.0",

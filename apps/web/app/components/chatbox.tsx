@@ -64,11 +64,11 @@ export function ChatBox() {
             </button>
           </div>
         </div>
-        <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#35012C]">
+        <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#0F0F14]">
           {Chats.map((chat, index) => (
             <div
               key={index}
-              className={`max-w-[75%] p-3 rounded-xl text-sm ${chat.username === UserName ? "ml-auto bg-[#3A015C]  text-white rounded-br-md" : "bg-[#11001C] text-gray-200 border border-[#4F0147] rounded-bl-md"}`}
+              className={`max-w-[75%] p-3 rounded-xl text-sm ${chat.username === UserName ? "ml-auto bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white" : "bg-white/5 text-white border border-white/10"}`}
             >
               <strong className="block text-xs mb-1 opacity-70 ">
                 {chat.username}
@@ -78,7 +78,7 @@ export function ChatBox() {
           ))}
         </div>
         <div className="p-3 border-t border-[#4F0147] flex gap-2 bg-[#290025]">
-          <input
+        <input
             type="message"
             name="message"
             value={msg}
@@ -88,7 +88,7 @@ export function ChatBox() {
           />
           <button
             onClick={HandleMsg}
-            className="bg-[#3A015C] text-white px-4 relative rounded-xl hover:bg-[#4F0147] transition"
+            className="bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white px-4 rounded-xl hover:opacity-90 transition"
           >
             <Send />
           </button>

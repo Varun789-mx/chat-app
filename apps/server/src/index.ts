@@ -17,8 +17,9 @@ async function init() {
         SocketService.handleUpgrade(request, socket, head);
     })
     SocketService.initlisteners();
+    console.log(process.env.BACKEND_URL);
     server.listen(PORT, () => {
-        console.log(`Server is running on ws://localhost:${PORT}`)
+        console.log(`Server is running on ws://${process.env.BACKEND_URL}:${PORT}`)
     })
 }
 

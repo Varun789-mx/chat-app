@@ -1,11 +1,4 @@
 "use client";
-import {
-  ArrowLeft,
-  CircleUser,
-  EllipsisVertical,
-  Phone,
-  Send,
-} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSocket } from "../context/SocketProvider";
 import { Chats, MsgObj, usertype } from "../lib/types";

@@ -2,9 +2,6 @@
 import React, { useCallback, useEffect, useContext, useRef, useState } from "react";
 import { ISocketContext, MsgObj, SocketProviderProp, usertype } from "../lib/types";
 
-
-
-
 export const SocketContext = React.createContext<ISocketContext | null>(null);
 
 export const useSocket = () => {
@@ -31,7 +28,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   useEffect(() => {
     const { roomId } = JSON.parse(localStorage.getItem("UserData") || "{}");
     if (!socketRef.current) {
-      socketRef.current = new WebSocket(`ws://localhost:8000?room=${roomId}`);
+      socketRef.current = new WebSocket(`ws://${process.env.NEXT_PUBLIC_BACKEND_URL}?room=${roomId}`);
       socketRef.current.onopen = () => {
         console.log('Web socket connected');
       }
