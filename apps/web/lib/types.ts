@@ -1,14 +1,14 @@
 export enum usertype {
   User = "USER",
-  Server = "SERVER"
+  Server = "SERVER",
 }
 export interface MsgObj {
-  id: string,
-  username: string,
-  type: usertype,
-  message: string,
-  roomId: string,
-  timeStamp: Date,
+  id: string;
+  username: string;
+  type: usertype;
+  message: string;
+  roomId: string;
+  timeStamp: Date;
 }
 export type Chats = MsgObj[];
 
@@ -22,7 +22,7 @@ export interface ISocketContext {
 }
 
 export interface ChatProp {
-  UserName: string,
+  UserName: string;
   roomId: string;
   isLoading: boolean;
   chats: MsgObj[];
@@ -30,4 +30,5 @@ export interface ChatProp {
   setRoomId: (Id: string) => void;
   setChats: (chat: MsgObj) => void;
   setUserName: (username: string) => void;
+  reset: () => void;
 }

@@ -1,6 +1,12 @@
-"use client"
-import { ArrowLeft, CircleUser, EllipsisVertical, Phone, Send } from "lucide-react";
-import { useEffect, useState } from "react"
+"use client";
+import {
+  ArrowLeft,
+  CircleUser,
+  EllipsisVertical,
+  Phone,
+  Send,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useSocket } from "../context/SocketProvider";
 import { Chats, MsgObj, usertype } from "../lib/types";
 import { RoomBox } from "./components/roombox";
@@ -9,8 +15,8 @@ import { useChatStore } from "../lib/useChatStore";
 
 export default function Page() {
   const socket = useSocket();
-  const username = useChatStore((state)=>state.UserName)
-   const roomId = useChatStore((state)=>state.roomId);
+  const username = useChatStore((state) => state.UserName);
+  const roomId = useChatStore((state) => state.roomId);
   const [chats, setchats] = useState<Chats>([]);
   const [msg, setmsg] = useState("");
   const [UserData, setUserData] = useState({
@@ -25,21 +31,19 @@ export default function Page() {
       type: usertype.User,
       roomId: UserData.roomId,
       message: msg,
-      timeStamp: new Date,
-    }
+      timeStamp: new Date(),
+    };
     socket.SendMessage(usermsg);
-    setchats(prev => [...prev, usermsg]);
-  }
+    setchats((prev) => [...prev, usermsg]);
+  };
   useEffect(() => {
     if (!UserData.roomId && !UserData.userName) {
       const localdata = JSON.parse(localStorage.getItem("UserData") || "{}");
       setUserData(localdata);
       if (!localdata) {
-
       }
-
     }
-  }, [])
+  }, []);
   useEffect(() => {
     const sm = socket.servermsg;
     if (!sm) return;
@@ -48,9 +52,9 @@ export default function Page() {
     }
 
     if (sm?.type === usertype.Server) {
-      setchats(prev => [...prev, sm]);
+      setchats((prev) => [...prev, sm]);
     }
-  }, [socket.servermsg])
+  }, [socket.servermsg]);
   // return (
   //   <div className="w-full bg-black flex justify-center h-screen">
   //     <div className="flex flex-col p-4 gap-4 justify-center bg-gray-800 ">
@@ -101,10 +105,6 @@ export default function Page() {
   //   </div>
   // )
   return (
-    <div>
-
-      {!username && !roomId ? <RoomBox /> :
-        <ChatBox />}
-    </div>
-  )
+    <div>{username !== "" && roomId !== "" ? <ChatBox /> : <RoomBox />}</div>
+  );
 }
