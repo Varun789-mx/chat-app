@@ -25,10 +25,14 @@ export const useChatStore = create<ChatProp>()(
           }));
         },
         reset: () => {
-          set({ roomId: "" });
-          set({ chats: [] });
-          set({ UserName: "" });
-          localStorage.clear();
+        set({roomId:"",
+          chats:[],
+          UserName:"",
+          isLoading:false,
+        });
+        localStorage.removeItem("Chat-store");
+        localStorage.removeItem("RoomId");
+        localStorage.removeItem("UserName");
         },
       }),
       { name: "Chat-store" }
