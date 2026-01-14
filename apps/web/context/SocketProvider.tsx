@@ -28,7 +28,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   useEffect(() => {
     const { roomId } = JSON.parse(localStorage.getItem("UserData") || "{}");
     if (!socketRef.current) {
-      socketRef.current = new WebSocket(`ws://${process.env.NEXT_PUBLIC_BACKEND_URL}?room=${roomId}`);
+      socketRef.current = new WebSocket(`wss://${process.env.NEXT_PUBLIC_BACKEND_URL}?room=${roomId}`);
       socketRef.current.onopen = () => {
         console.log('Web socket connected');
       }
