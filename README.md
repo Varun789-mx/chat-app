@@ -1,4 +1,4 @@
-# Chat Monorepo
+# Chat-app — Turbo Monorepo
 
 A small Turbo/Next.js monorepo implementing a real-time chat demo using a lightweight WebSocket server and Redis pub/sub.
 
