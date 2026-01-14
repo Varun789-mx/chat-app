@@ -1,135 +1,108 @@
-# Turborepo starter
+# Chat Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+A small Turbo/Next.js monorepo implementing a real-time chat demo using a lightweight WebSocket server and Redis pub/sub.
 
-## Using this example
+🔧 **Tech stack**
+- Frontend: Next.js (apps/web) + React + Zustand
+- Backend: Node + ws WebSocket server (apps/server)
+- Pub/Sub: Redis (ioredis)
+- Monorepo: Turborepo (root scripts)
 
-Run the following command:
+## 🚀 Project overview
+This repository contains three main apps:
 
-```sh
-npx create-turbo@latest
+- `apps/web` – Next.js frontend that connects to the WebSocket server and provides the chat UI. Uses `SocketProvider` + `useChatStore` (Zustand) to manage real-time messages.
+- `apps/server` – HTTP server that upgrades connections to WebSockets and handles pub/sub via Redis to broadcast messages per chat room.
+- `apps/docs` – Documentation site (Next.js) for the project.
+
+There are shared utility packages in `packages/*` (eslint/configs, shared UI components).
+
+---
+
+## 🧰 Requirements
+- Node >= 18
+- npm
+- Redis (local or remote) for pub/sub
+
+
+## ⚡ Quick start (local)
+Install dependencies from the repo root:
+
+```bash
+npm install
 ```
 
-## What's inside?
+Start everything (recommended) using Turborepo from the workspace root:
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+npm run dev
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Alternatively run apps individually:
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+```bash
+# In one terminal (server)
+cd apps/server
+npm install
+npm run dev
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+# In another terminal (web)
+cd apps/web
+npm install
+npm run dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+The Next.js frontend runs on port `3000` by default and the WebSocket server defaults to `8000` unless overridden via environment variables.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+---
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## 🔐 Environment variables
+Check `.env.example` files in each app for full list. Important variables:
 
-### Remote Caching
+- apps/server/.env.example
+  - `PORT` — server port (default: 8000)
+  - `REDIS_PORT`, `REDIS_HOSTNAME`, `REDIS_PASSWORD` — Redis connection
+  - `BACKEND_URL` — hostname (used in server logs)
+  - `NEXT_PUBLIC_BACKEND_URL` — used by client when creating the WebSocket URL
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- apps/web/.env.example
+  - `PORT` — Next.js port
+  - `NEXT_PUBLIC_BACKEND_URL` — **host:port** that the client uses to connect to the WebSocket server (see note below)
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+💡 Note: the client constructs the socket as `new WebSocket('wss://${NEXT_PUBLIC_BACKEND_URL}?room=...')`. For local setups set `NEXT_PUBLIC_BACKEND_URL=localhost:8000` (no protocol). Ensure the value matches what the server is actually listening on.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+---
 
-```
-cd my-turborepo
+## 📦 Scripts
+From the repo root (Turborepo):
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+- `npm run dev` — run all apps in dev mode (via `turbo run dev`)
+- `npm run build` — build all apps (via `turbo run build`)
+- `npm run lint` — run lint across workspaces
+- `npm run format` — run Prettier
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+Per-app scripts: see `apps/web/package.json` and `apps/server/package.json` (e.g. `npm run dev`, `npm run build`, `npm start`).
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+---
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## ✅ How it works (high-level)
+- Client connects to the WebSocket server with a `room` query param.
+- Server upgrades the connection and records which room each socket is in.
+- When a client sends a message the server publishes it to Redis using the room channel.
+- All subscribed server instances receive the Redis message and broadcast it to sockets connected to that room.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+This makes the chat horizontally scalable (multiple server instances can coordinate via Redis pub/sub).
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+---
 
-## Useful Links
+## 🐞 Troubleshooting
+- WebSocket connection issues:
+  - Ensure `NEXT_PUBLIC_BACKEND_URL` points to the correct `host:port` and uses `wss://` in production (or `ws://` for insecure local setups).
+  - Check both server and client env vars and ports.
+- Redis errors: confirm `REDIS_HOSTNAME`, `REDIS_PORT`, and `REDIS_PASSWORD` are correct and reachable.
+- CORS and proxies: if you deploy behind a proxy or load balancer, ensure it forwards upgrade headers for WebSocket traffic.
 
-Learn more about the power of Turborepo:
+---
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 📐 Contributing
+PRs welcome. Please run lint/format checks before opening a PR.
