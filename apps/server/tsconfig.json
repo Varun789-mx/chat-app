@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/base.json",
+  "extends": "../../packages/typescript-config/base.json",
   "compilerOptions": {
     // File Layout
     "rootDir": "./src",
@@ -8,7 +8,7 @@
     "target": "esnext",
     "types": [],
     // For nodejs:
-    
+
     "lib": [
       "esnext"
     ],
